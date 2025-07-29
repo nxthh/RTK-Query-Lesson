@@ -9,14 +9,14 @@ export default function NavbarBasic() {
   return (
     <>
       {/*<!-- Component: Basic Navbar --> */}
-      <header className=" relative z-20 w-full border-b border-slate-200 bg-white/90 shadow-lg shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-sm lg:after:hidden">
+      <header className="sticky mb-5 top-0 z-20 w-full border-b border-slate-200 bg-white/90 shadow-lg shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-sm lg:after:hidden">
         <div className="relative mx-auto max-w-full px-6 lg:max-w-5xl xl:max-w-7xl 2xl:max-w-[96rem]">
           <nav
             aria-label="main navigation"
-            className="flex h-[5.5rem] items-stretch justify-between font-medium text-slate-700"
+            className="flex h-[5rem] items-stretch justify-between font-medium text-slate-700"
             role="navigation"
           >
-            {/*      <!-- Brand logo --> */}
+            {/*<!-- Brand logo --> */}
             <NavLink
               id="WindUI"
               aria-label="WindUI logo"
@@ -24,7 +24,7 @@ export default function NavbarBasic() {
               className="flex items-center gap-2 whitespace-nowrap py-3 text-lg focus:outline-none lg:flex-1"
               href="javascript:void(0)"
             >
-              Counter 
+              Counter
             </NavLink>
             {/*      <!-- Mobile trigger --> */}
             <button
@@ -68,7 +68,11 @@ export default function NavbarBasic() {
                 <NavLink
                   role="menuitem"
                   aria-haspopup="false"
-                  className="flex items-center gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center text-teal-500 gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                      : "flex items-center gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                  }
                   to="/"
                 >
                   <span>Home</span>
@@ -79,13 +83,27 @@ export default function NavbarBasic() {
                   role="menuitem"
                   aria-current="page"
                   aria-haspopup="false"
-                  className="flex items-center gap-2 py-4 text-emerald-500 transition-colors duration-300 hover:text-emerald-600 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center text-teal-500 gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                      : "flex items-center gap-2 py-4 transition-colors duration-300 hover:text-emerald-500 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                  }
                   to="/products"
                 >
                   <span>Product</span>
                 </NavLink>
               </li>
-            
+              <li role="none" className="flex items-center">
+                <NavLink
+                  role="menuitem"
+                  aria-current="page"
+                  aria-haspopup="false"
+                  className="flex h-[40px] items-center gap-2 text-white rounded-md py-4 bg-emerald-500 transition-colors duration-300 hover:bg-emerald-600 focus:text-emerald-600 focus:outline-none focus-visible:outline-none lg:px-8"
+                  to="/login"
+                >
+                  <span>Login</span>
+                </NavLink>
+              </li>
             </ul>
           </nav>
         </div>

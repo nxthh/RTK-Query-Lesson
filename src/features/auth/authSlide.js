@@ -7,9 +7,9 @@ export const authApi = apiSlice.injectEndpoints({
         url: `/auth/login`,
         method: "POST",
         headers: {
-          ContentType: "application/json"
+          "Content-Type": "application/json"
         },
-        body: body
+        body: body // auto convert to JSON data
       })
     })
   })

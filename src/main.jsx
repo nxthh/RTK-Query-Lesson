@@ -8,15 +8,18 @@ import Product from "./pages/product/Product.jsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import ProductDetail from "./pages/product/ProductDetail.jsx";
 import Login from "./pages/auth/Login.jsx";
+import RootLayout from "./components/layouts/root-layout.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/products" element={<Product />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route element={<RootLayout />}>
+            <Route path="/" element={<App />} />
+            <Route path="/products" element={<Product />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+          </Route>
           <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
