@@ -6,7 +6,13 @@ function App() {
 
   console.log("data from RTK Query", data);
 
-  return <></>;
+  return (
+    <>
+      <div className=" h-[680px] flex justify-center items-center">
+        <p className=" text-white">Sorry teacher, no homepage yet🙏</p>
+      </div>
+    </>
+  );
 }
 
 export default App;
