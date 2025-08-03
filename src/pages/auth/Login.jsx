@@ -1,47 +1,41 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
+import { Button, Label, TextInput } from "flowbite-react";
+import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLoginMutation } from "../../features/auth/authSlide";
-import { ToastContainer, toast } from "react-toastify";
-import { useNavigate } from "react-router";
-import { FaRegEyeSlash } from "react-icons/fa";
-import { PiEye } from "react-icons/pi";
-import { useState } from "react";
 
-export default function App() {
-  const [login, { isLoading, isSuccess }] = useLoginMutation();
-  const [isShowPassword, setIsShowPassword] = useState(false);
+// const passwordRegex =
+//   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+const schema = z.object({
+  email: z.string().nonempty("Email is required").email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  // .string()
+  // .regex(
+  //   passwordRegex,
+  //   "Password must be at least 8 characters with at least 1 Uppercase and Special characters"
+  // ),
+});
+
+// test
+
+export default function Login() {
+  const [login, { isLoading }] = useLoginMutation();
+
   const navigate = useNavigate();
-
-  console.log(isLoading);
-
-  const shcema = z.object({
-    email: z.string().nonempty("email is required").email(),
-    password: z.string().nonempty("password is required")
-  });
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
-  } = useForm({
-    defaultValues: {
-      email: "",
-      password: ""
-    },
-    resolver: zodResolver(shcema)
-  });
-
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(schema) });
   const onSubmit = async (data) => {
     try {
       let result = await login(data).unwrap();
-
-      if (result != undefined) {
-        navigate("/");
-      }
     } catch (errors) {
-      toast.error(errors?.data?.message);
       console.log("ERROR: ", errors?.data?.message);
     } finally {
       reset();
@@ -49,59 +43,48 @@ export default function App() {
   };
 
   return (
-    <section className="bg-teal-600 w-[100%] h-screen">
-      <div className="h-screen flex justify-center items-center mx-auto">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="min-w-sm md:min-w-xl bg-gray-50 p-5 rounded-2xl "
-        >
-          <div className="flex flex-col gap-5">
-            <h1 className="text-3xl text-center py-2 font-bold text-teal-600">
-              Login
-            </h1>
-            <div className="flex flex-col">
-              <input
-                {...register("email")}
-                className="px-2.5 py-2.5 border border-slate-400 rounded-xl"
-                placeholder="email"
-                type="text"
-              />
-              {errors.email && (
-                <span className="text-red-600 mt-2">
-                  This field is required
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col relative">
-              <div
-                onClick={() => setIsShowPassword(!isShowPassword)}
-                className="absolute top-4 right-4"
-              >
-                {isShowPassword ? <PiEye /> : <FaRegEyeSlash />}
-                {/* <PiEye /> */}
-              </div>
-              <input
-                {...register("password")}
-                className="px-2.5 py-2.5 border border-slate-400 rounded-xl"
-                type={isShowPassword ? "text" : "password"}
-                placeholder="Password"
-              />
-              {errors.password && (
-                <span className="text-red-600 mt-2">
-                  This field is required
-                </span>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="bg-teal-600 hover:bg-teal-700 px-5 py-2 rounded-xl text-white"
-            >
-              {isLoading ? "Loading..." : "Login"}
-            </button>
+    <div className="flex items-center justify-center min-h-screen">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4 max-w-md w-full"
+      >
+        <div>
+          <div className="mb-2 block">
+            <Label htmlFor="email">Email</Label>
           </div>
-        </form>
-      </div>
-      <ToastContainer />
-    </section>
+          <TextInput
+            {...register("email")}
+            id="email"
+            type="text"
+            placeholder="john@mail.com"
+          />
+          {errors.email && (
+            <p className="text-red-500">{errors.email.message}</p>
+          )}
+        </div>
+        <div>
+          <div className="mb-2 block">
+            <Label htmlFor="password">Your password</Label>
+          </div>
+          <TextInput
+            {...register("password")}
+            id="password"
+            type="password"
+            placeholder="Password"
+          />
+          {errors.password && (
+            <p className="text-red-500">{errors.password.message}</p>
+          )}
+        </div>
+        <Button type="submit">{isLoading ? "Loading..." : "Login"}</Button>
+        <Button
+          className=" bg-zinc-400 dark:bg-zinc-700"
+          type="button"
+          onClick={() => navigate(-1)}
+        >
+          Go Back
+        </Button>
+      </form>
+    </div>
   );
 }
