@@ -5,8 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ToastContainer, toast } from "react-toastify";
-import { useRegisterUserMutation } from "../../features/auth/authSlide"; // Assuming you have a register mutation
-
+import { useRegisterUserMutation } from "../../features/auth/authSlide";
 const schema = z.object({
   username: z
     .string()
@@ -134,23 +133,7 @@ export default function SignUp() {
             </p>
           )}
         </div>
-        {/* Removed Confirm Password Field */}
-        {/*
-        <div>
-          <div className="mb-2 block">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-          </div>
-          <TextInput
-            {...register("confirmPassword")}
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-          )}
-        </div>
-        */}
+
         <div>
           <div className="mb-2 block">
             <Label htmlFor="profilePicture">Profile Picture (Optional)</Label>
