@@ -64,12 +64,12 @@ export default function Products() {
             {/* You might need to adjust the Filter component to work with new category structure if it expects specific data */}
             <Filter categories={categories} />
             {isLoading && (
-              <p className="text-zinc-700 dark:text-zinc-300 col-span-full text-center">
+              <p className="text-zinc-700 dark:text-zinc-300 col-span-full text-center my-25">
                 Loading products...
               </p>
             )}
             {error && (
-              <p className="text-red-500 col-span-full text-center">
+              <p className="text-red-500 col-span-full text-center my-25">
                 Error loading products: {error.message}
               </p>
             )}

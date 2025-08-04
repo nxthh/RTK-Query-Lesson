@@ -5,48 +5,49 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ToastContainer, toast } from "react-toastify";
-import { useRegisterUserMutation } from "../../features/auth/authSlide";
+import { useRegisterMutation } from "../../features/auth/authSlide";
+import { FaRegEyeSlash } from "react-icons/fa";
+import { PiEye } from "react-icons/pi";
+
+// The schema is updated to match the fields from Register2
+// using `name` instead of `username` and a minimum password length of 4.
 const schema = z.object({
-  username: z
-    .string()
-    .nonempty("Username is required")
-    .max(18, "Username must be at most 18 characters"),
+  name: z.string().nonempty("name is required"),
   email: z
     .string()
     .nonempty("Email is required")
     .email("Invalid email address"),
   password: z
     .string()
-    .nonempty("Password is required")
-    .min(8, "Password must be at least 8 characters"),
+    .nonempty("password is required")
+    .min(4, "Must be greater than 4"),
   profilePicture: z.any().optional(), // For file input
-});
+}); 
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [registerUser, { isLoading, isSuccess }] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterMutation();
+  const [isShowPassword, setIsShowPassword] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const {
     register,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
 
-  const [isDragOver, setIsDragOver] = useState(false);
-
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("username", data.username);
+      formData.append("name", data.name); // Use 'name' field
       formData.append("email", data.email);
       formData.append("password", data.password);
       if (data.profilePicture && data.profilePicture[0]) {
         formData.append("profilePicture", data.profilePicture[0]);
       }
 
-      let result = await registerUser(formData).unwrap();
+      const result = await registerUser(formData).unwrap();
 
       if (result) {
         toast.success("Registration successful! Please log in.");
@@ -55,8 +56,6 @@ export default function SignUp() {
     } catch (errors) {
       toast.error(errors?.data?.message || "Registration failed.");
       console.log("ERROR: ", errors?.data?.message);
-    } finally {
-      reset();
     }
   };
 
@@ -87,20 +86,19 @@ export default function SignUp() {
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white text-center mb-4">
           Register Account
         </h2>
+        {/* Name field, updated from 'username' */}
         <div>
           <div className="mb-2 block">
-            <Label htmlFor="username">Your Username</Label>
+            <Label htmlFor="name">Your Name</Label>
           </div>
           <TextInput
-            {...register("username")}
-            id="username"
+            {...register("name")}
+            id="name"
             type="text"
             placeholder="John Doe"
           />
-          {errors.username && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.username.message}
-            </p>
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
         <div>
@@ -117,16 +115,26 @@ export default function SignUp() {
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
+        {/* Password field with visibility toggle, adopted from Register2 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="password">Your Password</Label>
           </div>
-          <TextInput
-            {...register("password")}
-            id="password"
-            type="password"
-            placeholder="Password"
-          />
+          <div className="relative">
+            <TextInput
+              {...register("password")}
+              id="password"
+              type={isShowPassword ? "text" : "password"}
+              placeholder="Password"
+              className="pr-10" // Add padding to not overlap with icon
+            />
+            <div
+              onClick={() => setIsShowPassword(!isShowPassword)}
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-zinc-500 dark:text-zinc-400"
+            >
+              {isShowPassword ? <PiEye /> : <FaRegEyeSlash />}
+            </div>
+          </div>
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">
               {errors.password.message}

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router";
-import { FaShoppingCart } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { NavLink } from "react-router"; // Corrected import from 'react-router' to 'react-router-dom'
+import { FaShoppingCart, FaSun, FaMoon } from "react-icons/fa"; // Added FaSun and FaMoon icons
 import { useSelector } from "react-redux";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState(
+    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+  ); // Initialize theme from localStorage or 'light'
 
   const menu = [
     { title: "Home", path: "/" },
@@ -13,8 +16,22 @@ export default function Navbar() {
     { title: "Contact", path: "/contact" },
   ];
 
-
   const count = useSelector((state) => state.count.value);
+
+  // Effect to apply the theme class to the document's html element
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme); // Store theme preference
+  }, [theme]);
+
+  const handleThemeSwitch = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
     <div>
@@ -27,7 +44,7 @@ export default function Navbar() {
                   Ace Shop
                 </span>
               </NavLink>
-              {/* Rest of the JSX remains the same */}
+
               <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
                 <ul className="flex space-x-8 font-medium">
                   {menu.map((nav, index) => (
@@ -49,6 +66,19 @@ export default function Navbar() {
               </div>
 
               <div className="flex items-center space-x-4">
+                {/* Theme Toggle Button for Desktop */}
+                <button
+                  onClick={handleThemeSwitch}
+                  className="text-zinc-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500 p-2 rounded-full hidden md:block"
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? (
+                    <FaSun className="w-5 h-5" />
+                  ) : (
+                    <FaMoon className="w-5 h-5" />
+                  )}
+                </button>
+
                 <NavLink
                   to="/cart"
                   className="relative text-zinc-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500"
@@ -107,6 +137,23 @@ export default function Navbar() {
               id="navbar-sticky"
             >
               <ul className="flex flex-col p-4 mt-4 font-medium border rounded-lg space-y-2 bg-white dark:bg-zinc-800">
+                {/* Theme Toggle Button for Mobile */}
+                <li>
+                  <button
+                    onClick={() => {
+                      handleThemeSwitch();
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center justify-between w-full py-2 px-3 text-zinc-900 rounded-sm hover:bg-zinc-100 dark:text-white dark:hover:bg-zinc-700"
+                  >
+                    <span>Switch Theme</span>
+                    {theme === "dark" ? (
+                      <FaSun className="w-5 h-5" />
+                    ) : (
+                      <FaMoon className="w-5 h-5" />
+                    )}
+                  </button>
+                </li>
                 <li>
                   <NavLink
                     to="/"

@@ -25,42 +25,42 @@ export default function ProductCard({
   return (
     <Link
       to={`/products/${id}`}
-      className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm hover:ring-2 hover:ring-primary-700 hover:scale-102 hover:duration-200 ease-in-out dark:border-zinc-700 dark:bg-zinc-800"
+      className="flex flex-col rounded-lg border border-zinc-200 bg-white p-6 shadow-sm hover:ring-2 hover:ring-primary-700 hover:scale-102 hover:duration-200 ease-in-out dark:border-zinc-700 dark:bg-zinc-800"
     >
       <div className="h-56 w-full">
         <img
-  className="mx-auto h-full dark:block"
-  src={
-    thumbnail && thumbnail.startsWith("https://api.escuelajs.co/")
-      ? "https://via.placeholder.com/640x480?text=No+Image" // This is the line that handles the fallback
-      : thumbnail
-  }
-  alt={title}
-  onError={(e) => {
-    e.target.src = "https://via.placeholder.com/640x480?text=No+Image"; // This is also good for onError
-  }}
-/>
+          className="mx-auto h-full dark:block"
+          src={
+            thumbnail && thumbnail.startsWith("https://api.escuelajs.co/")
+              ? "https://via.placeholder.com/640x480?text=No+Image" // This is the line that handles the fallback
+              : thumbnail
+          }
+          alt={title}
+          onError={(e) => {
+            e.target.src = "https://via.placeholder.com/640x480?text=No+Image"; // This is also good for onError
+          }}
+        />
       </div>
-      <div className="pt-6">
+      <div className="pt-6 flex flex-col flex-grow justify-between">
         <div className="mb-4 flex items-center justify-between gap-4">
           {/* If you don't have discountPercentage, you can remove or modify this span */}
           {/* <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-            Up to {discountPercentage}% off
-          </span> */}
+                Up to {discountPercentage}% off
+            </span> */}
         </div>
         <div className="grid gap-1">
           <span className="text-lg font-semibold leading-tight text-zinc-900 dark:text-white">
             {title}
           </span>
-          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300 line-clamp-1">
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300 h-10 line-clamp-2">
             {description}
           </p>
         </div>
         <div className="mt-2 flex items-center gap-2">
           {/* If you don't have rating, you can remove or modify this paragraph */}
           {/* <p className="text-sm font-medium text-zinc-900 dark:text-white">
-            Rating: {rating}
-          </p> */}
+                Rating: {rating}
+            </p> */}
         </div>
         <ul className="mt-2 flex items-center gap-4">
           <li key="delivery" className="flex items-center gap-2">
