@@ -3,5 +3,15 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }), // Use proxy
-  endpoints: (build) => ({}),
+  endpoints: (build) => ({
+    createProduct: build.mutation({
+      query: (productData) => ({
+        url: "/products",
+        method: "POST",
+        body: productData,
+      }),
+    }),
+  }),
 });
+
+export const { useCreateProductMutation } = apiSlice;

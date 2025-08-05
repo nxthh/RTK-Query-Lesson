@@ -13,6 +13,7 @@ import Login from "./pages/auth/Login.jsx";
 import SignUp from "./pages/auth/SignUp.jsx";
 import { store } from "./store.js";
 import { Provider } from "react-redux";
+import CreateProductPage from "./pages/createProduct/CreateProduct.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -29,6 +30,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="*" element={<PageNotFound />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/create-product" element={<CreateProductPage />}/>
         </Routes>
       </BrowserRouter>
     </Provider>
