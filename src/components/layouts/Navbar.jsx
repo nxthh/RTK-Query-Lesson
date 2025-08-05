@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router"; // Corrected import from 'react-router' to 'react-router-dom'
-import { FaShoppingCart, FaSun, FaMoon } from "react-icons/fa"; // Added FaSun and FaMoon icons
+import { NavLink } from "react-router";
+import { FaShoppingCart, FaSun, FaMoon } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
-  ); // Initialize theme from localStorage or 'light'
+
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    return savedTheme || "light";
+  });
 
   const menu = [
     { title: "Home", path: "/" },
@@ -18,19 +26,18 @@ export default function Navbar() {
 
   const count = useSelector((state) => state.count.value);
 
-  // Effect to apply the theme class to the document's html element
   useEffect(() => {
-    const root = window.document.documentElement;
     if (theme === "dark") {
-      root.classList.add("dark");
+      document.documentElement.classList.add("dark");
     } else {
-      root.classList.remove("dark");
+      document.documentElement.classList.remove("dark");
     }
-    localStorage.setItem("theme", theme); // Store theme preference
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const handleThemeSwitch = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+  const toggleDarkMode = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
   };
 
   return (
@@ -68,7 +75,7 @@ export default function Navbar() {
               <div className="flex items-center space-x-4">
                 {/* Theme Toggle Button for Desktop */}
                 <button
-                  onClick={handleThemeSwitch}
+                  onClick={toggleDarkMode} // Use the new toggleDarkMode
                   className="text-zinc-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500 p-2 rounded-full hidden md:block"
                   aria-label="Toggle theme"
                 >
@@ -141,7 +148,7 @@ export default function Navbar() {
                 <li>
                   <button
                     onClick={() => {
-                      handleThemeSwitch();
+                      toggleDarkMode(); // Use the new toggleDarkMode
                       setIsOpen(false);
                     }}
                     className="flex items-center justify-between w-full py-2 px-3 text-zinc-900 rounded-sm hover:bg-zinc-100 dark:text-white dark:hover:bg-zinc-700"

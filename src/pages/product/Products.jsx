@@ -5,17 +5,17 @@ import ShowMoreButton from "../../components/showMoreButton";
 import ProductCard from "../../components/card/productCard";
 import { useGetProductsQuery } from "../../features/product/productSlice2";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL; //
-
 async function fetchData(endpoint) {
-  const url = `${BASE_URL}${
-    endpoint.startsWith("/") ? endpoint : "/" + endpoint
-  }`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`HTTP error! status: ${res.status}`);
+  const url = `/api${endpoint.startsWith("/") ? endpoint : "/" + endpoint}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return res.json();
+  } catch (error) {
+    throw error;
   }
-  return res.json();
 }
 
 export default function Products() {
@@ -30,14 +30,12 @@ export default function Products() {
     const fetchCategories = async () => {
       try {
         const categoriesData = await fetchData("/categories");
-        // Assuming categoriesData is an array of objects like { id: 1, name: "Clothes", image: "..." }
         setCategories([
-          { name: "All categories", id: null }, // Add "All categories" option
+          { name: "All categories", id: null },
           ...categoriesData.map((cat) => ({ name: cat.name, id: cat.id })),
         ]);
       } catch (error) {
-        console.error("Error fetching categories:", error);
-        setCategories([]);
+        setCategories([{ name: "All categories", id: null }]);
       }
     };
     fetchCategories();
@@ -47,6 +45,10 @@ export default function Products() {
     const category = categories.find((cat) => cat.name === categoryName);
     setSelectedCategory(category || { name: "All categories", id: null });
   };
+
+  const filteredProducts = selectedCategory.id
+    ? products.filter((product) => product.category?.id === selectedCategory.id)
+    : products;
 
   return (
     <>
@@ -61,7 +63,6 @@ export default function Products() {
       <main>
         <section className="bg-zinc-50 py-8 antialiased dark:bg-zinc-900 md:py-12">
           <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-            {/* You might need to adjust the Filter component to work with new category structure if it expects specific data */}
             <Filter categories={categories} />
             {isLoading && (
               <p className="text-zinc-700 dark:text-zinc-300 col-span-full text-center my-25">
@@ -75,20 +76,31 @@ export default function Products() {
             )}
             {!isLoading && !error && (
               <section className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
-                {products.length > 0 ? (
-                  products.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      id={product.id}
-                      thumbnail={product.images[0]} // Platzi API returns an array of images
-                      discountPercentage={null} // Platzi API doesn't seem to have discountPercentage directly
-                      title={product.title}
-                      description={product.description}
-                      rating={null} // Platzi API doesn't seem to have rating directly
-                      stock={null} // Platzi API doesn't seem to have stock directly
-                      price={product.price}
-                    />
-                  ))
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => {
+                    const thumbnail =
+                      product.images &&
+                      product.images[0] &&
+                      product.images[0].startsWith("http")
+                        ? product.images[0].replace(
+                            "https://api.escuelajs.co/api/v1",
+                            "/api"
+                          )
+                        : "https://placehold.co/640x480?text=No+Image";
+                    return (
+                      <ProductCard
+                        key={product.id}
+                        id={product.id}
+                        thumbnail={thumbnail}
+                        discountPercentage={null}
+                        title={product.title}
+                        description={product.description}
+                        rating={null}
+                        stock={null}
+                        price={product.price}
+                      />
+                    );
+                  })
                 ) : (
                   <p className="text-zinc-700 dark:text-zinc-300 col-span-full text-center">
                     No products found for this category.

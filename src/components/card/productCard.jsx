@@ -8,12 +8,9 @@ import { increment } from "../../features/count/countSlice";
 
 export default function ProductCard({
   id,
-  thumbnail, // This will now be product.images[0]
-  // discountPercentage, // Likely no longer available
+  thumbnail,
   title,
   description,
-  // rating, // Likely no longer available
-  // stock, // Likely no longer available
   price,
 }) {
   // You'll need to decide how to handle missing data like discountPercentage, rating, stock.
