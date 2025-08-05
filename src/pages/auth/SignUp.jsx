@@ -9,26 +9,34 @@ import { useRegisterMutation } from "../../features/auth/authSlide";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { PiEye } from "react-icons/pi";
 
-// The schema is updated to match the fields from Register2
-// using `name` instead of `username` and a minimum password length of 4.
 const schema = z.object({
-  name: z.string().nonempty("name is required"),
+  name: z.string().nonempty("Name is required"),
   email: z
     .string()
     .nonempty("Email is required")
     .email("Invalid email address"),
   password: z
     .string()
-    .nonempty("password is required")
+    .nonempty("Password is required")
     .min(4, "Must be greater than 4"),
-  profilePicture: z.any().optional(), // For file input
-}); 
+  avatar: z.any(), // File input; will be converted to URL in onSubmit
+});
 
 export default function SignUp() {
   const navigate = useNavigate();
   const [registerUser, { isLoading }] = useRegisterMutation();
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [preview, setPreview] = useState(null);
+
+  const handleImagePreview = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setPreview(null);
+    }
+  };
 
   const {
     register,
@@ -39,23 +47,49 @@ export default function SignUp() {
 
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append("name", data.name); // Use 'name' field
-      formData.append("email", data.email);
-      formData.append("password", data.password);
-      if (data.profilePicture && data.profilePicture[0]) {
-        formData.append("profilePicture", data.profilePicture[0]);
+      // Default avatar URL if no file is uploaded
+      let avatarUrl = "https://api.lorem.space/image/face?w=640&h=480";
+
+      if (data.avatar && data.avatar[0]) {
+        // Upload file to Platzi Fake API
+        const formData = new FormData();
+        formData.append("file", data.avatar[0]);
+
+        const uploadResponse = await fetch(
+          "https://api.escuelajs.co/api/v1/files/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!uploadResponse.ok) {
+          console.warn("File upload failed, using default avatar");
+        } else {
+          const uploadResult = await uploadResponse.json();
+          avatarUrl = uploadResult.location; // Use uploaded file URL
+        }
       }
 
-      const result = await registerUser(formData).unwrap();
+      // Create JSON payload for user registration
+      const payload = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        avatar: avatarUrl, // Always include a valid URL
+      };
+
+      const result = await registerUser(payload).unwrap();
 
       if (result) {
         toast.success("Registration successful! Please log in.");
         navigate("/login");
       }
-    } catch (errors) {
-      toast.error(errors?.data?.message || "Registration failed.");
-      console.log("ERROR: ", errors?.data?.message);
+    } catch (error) {
+      const errorMessage =
+        error?.data?.message || error?.message || "Registration failed.";
+      toast.error(errorMessage);
+      console.error("Registration Error:", error);
     }
   };
 
@@ -73,7 +107,8 @@ export default function SignUp() {
     setIsDragOver(false);
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      setValue("profilePicture", files);
+      setValue("avatar", files);
+      handleImagePreview({ target: { files } });
     }
   };
 
@@ -86,7 +121,6 @@ export default function SignUp() {
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white text-center mb-4">
           Register Account
         </h2>
-        {/* Name field, updated from 'username' */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="name">Your Name</Label>
@@ -115,7 +149,6 @@ export default function SignUp() {
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
-        {/* Password field with visibility toggle, adopted from Register2 */}
         <div>
           <div className="mb-2 block">
             <Label htmlFor="password">Your Password</Label>
@@ -126,7 +159,7 @@ export default function SignUp() {
               id="password"
               type={isShowPassword ? "text" : "password"}
               placeholder="Password"
-              className="pr-10" // Add padding to not overlap with icon
+              className="pr-10"
             />
             <div
               onClick={() => setIsShowPassword(!isShowPassword)}
@@ -141,10 +174,9 @@ export default function SignUp() {
             </p>
           )}
         </div>
-
         <div>
           <div className="mb-2 block">
-            <Label htmlFor="profilePicture">Profile Picture (Optional)</Label>
+            <Label htmlFor="avatar">Profile Picture</Label>
           </div>
           <div
             className={`flex items-center justify-center w-full h-32 ${
@@ -154,49 +186,57 @@ export default function SignUp() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <label
-              htmlFor="dropzone-file"
-              className="flex flex-col items-center justify-center w-full h-full p-4"
-            >
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <svg
-                  className="w-8 h-8 mb-4 text-zinc-500 dark:text-zinc-400"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 16"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L7 9m3-3 3 3"
-                  />
-                </svg>
-                <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
-                  <span className="font-semibold">Click to upload</span> or drag
-                  and drop
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  SVG, PNG, JPG or GIF (MAX. 800x400px)
-                </p>
-              </div>
-              <FileInput
-                {...register("profilePicture")}
-                id="dropzone-file"
-                className="hidden"
-                accept="image/*"
+            {preview ? (
+              <img
+                src={preview}
+                alt="Preview"
+                className="h-full w-full object-cover rounded-lg"
               />
-            </label>
+            ) : (
+              <label
+                htmlFor="dropzone-file"
+                className="flex flex-col items-center justify-center w-full h-full p-4"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg
+                    className="w-8 h-8 mb-4 text-zinc-500 dark:text-zinc-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 16"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L7 9m3-3 3 3"
+                    />
+                  </svg>
+                  <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
+                  </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    SVG, PNG, JPG or GIF (MAX. 800x400px)
+                  </p>
+                </div>
+                <FileInput
+                  {...register("avatar")}
+                  onChange={handleImagePreview}
+                  id="dropzone-file"
+                  className="hidden"
+                  accept="image/*"
+                />
+              </label>
+            )}
           </div>
-          {errors.profilePicture && (
+          {errors.avatar && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.profilePicture.message}
+              {errors.avatar.message}
             </p>
           )}
         </div>
-
         <Button type="submit" className="w-full mt-2">
           {isLoading ? "Registering..." : "Register new account"}
         </Button>
